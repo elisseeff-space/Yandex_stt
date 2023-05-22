@@ -1,5 +1,5 @@
 import audio_sqlite_db
-from elis_google_stt import transcribe_file
+#from elis_google_stt import transcribe_file
 from pathlib import Path
 from aiogram import Dispatcher, types
 from aiogram.types import ContentType, File, Message, ReplyKeyboardRemove
@@ -36,7 +36,6 @@ async def voice_message_handler(message: Message): # types.Message):
 
 async def language_ru_default(message : types.Message):
     global_lang = 'ru'
-<<<<<<< HEAD
     #await bot.send_message(message.from_user.id, 'Russian Language of Voice Messages.')
     await bot.reply('Russian Language of Voice Messages.')
 
@@ -49,7 +48,7 @@ async def language_fr_command(message : types.Message):
     global_lang = 'fr'
     #await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
     await bot.reply('France Language of Voice Messages.')
-=======
+
     global_lang_model = 'default'
     await bot.send_message(message.from_user.id, 'Russian Language. Default. Best for audio that is not one of the specific audio models. For example, long-form audio. Ideally the audio is high-fidelity, recorded at a 16khz or greater sampling rate.')
 
@@ -62,7 +61,6 @@ async def language_fr_command(message : types.Message):
     global_lang = 'fr'
     global_lang_model = 'default'
     await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
->>>>>>> ManyModels
 
 async def language_ru_command_and_search(message : types.Message):
     global_lang = 'ru'

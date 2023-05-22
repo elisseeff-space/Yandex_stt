@@ -19,10 +19,10 @@ logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 logging.basicConfig(
     level=logging.INFO,
-    filename="audio_bot.log",
+    filename="/home/pavel/github/Yandex_stt/log/yandex_stt_bot.log",
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
-handler = logging.FileHandler('audio_bot.log')
+handler = logging.FileHandler('/home/pavel/github/Yandex_stt/log/yandex_stt_bot.log')
 handler.setLevel(logging.INFO)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -34,7 +34,7 @@ config = json.load(file)
 #now = datetime.now()
 
 async def on_startup(_):
-    logger.warning("Elisseeff Audio Bot logging is ON!")
+    logger.warning("Elisseeff Yandex STT Bot logging is ON!")
     audio_sqlite_db.sql_start(logger)
 
 # Start the bot
