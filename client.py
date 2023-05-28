@@ -3,16 +3,18 @@ import audio_sqlite_db
 from pathlib import Path
 from aiogram import Dispatcher, types
 from aiogram.types import ContentType, File, Message, ReplyKeyboardRemove
-from create_bot import bot, dp, global_lang
+from create_bot import bot, my_lang
 from client_kb import kb_client
+from recognize_yandex_stt import transcribe_file
+from datetime import datetime
 
 #@dp.message_handler(commands=['start', 'help'])
 async def command_start(message : types.Message):
     try:
-        await bot.reply('Hi! It is voice recognition bot. You can send voice message.', reply_markup=kb_client)
+        await bot.send_message(message.from_user.id, 'Hi! It is Yandex voice recognition bot. You can send voice message.', reply_markup=kb_client)
         #await message.delete()
     except:
-        await message.reply('Общение с ботом через личку. Напишите ему:\nhttps://t.me/rtlab_voice_bot')
+        await message.reply('Something wrong with me... \nhttps://t.me/rtlab_voice_bot', reply_markup=kb_client)
 
 async def handle_file(file: File, file_name: str, path: str):
     Path(f"{path}").mkdir(parents=True, exist_ok=True)
@@ -23,65 +25,47 @@ async def handle_file(file: File, file_name: str, path: str):
 async def voice_message_handler(message: Message): # types.Message):
     # Get the file ID of the voice message
     voice = await message.voice.get_file()
-    path = "/home/pavel/github/AudioTelega/voices"
+    path = "/home/pavel/github/Yandex_stt/voices"
 
     await handle_file(file=voice, file_name=f"{voice.file_id}.ogg", path=path)
     
     file_name = path + f"/{voice.file_id}.ogg"
-    result = transcribe_file(file_name)
-    # answer_message = "@Elis_OpenAI_bot {}".format(result.alternatives[0].transcript)
-    answer_message = result.alternatives[0].transcript
-    await message.reply(answer_message)
-    await audio_sqlite_db.use_log_add_command(message.from_user.username, message.from_user.id, answer_message, result.language_code, float(result.alternatives[0].confidence))
+    start_time = datetime.now()
+    str_buf = f"Recognition starts at: {start_time.strftime('%H:%M:%S')}."
+    await message.reply(str_buf)
+    alternative = transcribe_file(file_name)
+    end_time = datetime.now()
+    runtime = end_time - start_time
+    str_buf = f"Recognition ready in: {runtime} seconds."
+    await message.reply(str_buf)
+    
+    await message.reply(alternative.text)
+    await audio_sqlite_db.use_log_add_command(message.from_user.username, message.from_user.id, alternative.text, len(alternative.words), my_lang.get(), float(alternative.confidence))
 
-async def language_ru_default(message : types.Message):
-    global_lang = 'ru'
+async def language_ru_command(message : types.Message):
+    my_lang.set('ru-RU')
     #await bot.send_message(message.from_user.id, 'Russian Language of Voice Messages.')
-    await bot.reply('Russian Language of Voice Messages.')
+    await message.reply('Russian Language of Voice Messages.')
 
 async def language_en_command(message : types.Message):
-    global_lang = 'en'
+    my_lang.set('en-US')
     #await bot.send_message(message.from_user.id, 'English Language of Voice Messages.')
-    await bot.reply('English Language of Voice Messages.')
+    await message.reply('English Language of Voice Messages.')
 
 async def language_fr_command(message : types.Message):
-    global_lang = 'fr'
+    my_lang.set('fr-FR')
     #await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
-    await bot.reply('France Language of Voice Messages.')
+    await message.reply('France Language of Voice Messages.')
 
-    global_lang_model = 'default'
-    await bot.send_message(message.from_user.id, 'Russian Language. Default. Best for audio that is not one of the specific audio models. For example, long-form audio. Ideally the audio is high-fidelity, recorded at a 16khz or greater sampling rate.')
+async def language_de_command(message : types.Message):
+    my_lang.set('de-DE')
+    #await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
+    await message.reply('German Language of Voice Messages.')
 
-async def language_en_command(message : types.Message):
-    global_lang = 'en'
-    global_lang_model = 'default'
-    await bot.send_message(message.from_user.id, 'English Language of Voice Messages.')
-
-async def language_fr_command(message : types.Message):
-    global_lang = 'fr'
-    global_lang_model = 'default'
-    await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
-
-async def language_ru_command_and_search(message : types.Message):
-    global_lang = 'ru'
-    global_lang_model = 'command_and_search'
-    await bot.send_message(message.from_user.id, 'Russian Language. Command and search. Best for short queries such as voice commands or voice search.')
-
-async def language_ru_phone_call(message : types.Message):
-    global_lang = 'ru'
-    global_lang_model = 'phone_call'
-    await bot.send_message(message.from_user.id, 'Russian Language. Enhanced phone call. Best for audio that originated from a phone call (typically recorded at an 8khz sampling rate).')
-
-async def language_ru_latest_long(message : types.Message):
-    global_lang = 'ru'
-    global_lang_model = 'latest_long'
-    await bot.send_message(message.from_user.id, 'Russian Language. Latest Long. Best for long form content like media or conversation.')
-
-async def language_ru_latest_short(message : types.Message):
-    global_lang = 'ru'
-    global_lang_model = 'latest_short'
-    await bot.send_message(message.from_user.id, 'Russian Language. Best for short form content like commands or single shot directed speech.')
-
+async def language_auto_command(message : types.Message):
+    my_lang.set('auto')
+    #await bot.send_message(message.from_user.id, 'France Language of Voice Messages.')
+    await message.reply('автоматическое распознавание языка.')
 
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(voice_message_handler, content_types=[
@@ -90,11 +74,11 @@ def register_handlers_client(dp : Dispatcher):
     types.ContentType.DOCUMENT
     ])
     dp.register_message_handler(command_start, commands=['start', 'help'])
-    dp.register_message_handler(language_ru_default, commands=['ru_default'])
+    dp.register_message_handler(language_ru_command, commands=['ru'])
     dp.register_message_handler(language_en_command, commands=['en'])
     dp.register_message_handler(language_fr_command, commands=['fr'])
-    dp.register_message_handler(language_ru_command_and_search, commands=['ru_command_and_search'])
-    dp.register_message_handler(language_ru_phone_call, commands=['ru_phone_call'])
-    dp.register_message_handler(language_ru_latest_long, commands=['ru_latest_long'])
-    dp.register_message_handler(language_ru_latest_short, commands=['ru_latest_short'])
+    dp.register_message_handler(language_auto_command, commands=['auto'])
+    dp.register_message_handler(language_de_command, commands=['ru_phone_call'])
+    #dp.register_message_handler(language_ru_latest_long, commands=['ru_latest_long'])
+    #dp.register_message_handler(language_ru_latest_short, commands=['ru_latest_short'])
     

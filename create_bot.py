@@ -9,10 +9,17 @@ config = json.load(file)
 
 storage = MemoryStorage()
 
+class BotLanguage:
+    def __init__(self, lang):
+        self.lang = lang
+    def set(self, lang):
+        self.lang = lang
+    def get(self):
+        return self.lang
+
+my_lang = BotLanguage('auto')
+
 #bot = Bot(token = config['rtlab_voice_bot_token'])
 bot = Bot(token = config['VoskModelSTT_bot'])
 
 dp = Dispatcher(bot, storage=storage)
-
-global_lang = 'ru'
-global_lang_model = 'dafault'

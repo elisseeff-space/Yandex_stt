@@ -1,13 +1,12 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton#, ReplyKeyboardRemove
 
 b1 = KeyboardButton('Share your PhoneNumber', request_contact=True)
-b2 = KeyboardButton('/ru_default')
-b3 = KeyboardButton('/en')
-b4 = KeyboardButton('/fr')
-b5 = KeyboardButton('/ru_command_and_search')
-b6 = KeyboardButton('/ru_phone_call')
-b7 = KeyboardButton('/ru_latest_long')
-b8 = KeyboardButton('/ru_latest_short')
+b2 = KeyboardButton('/auto')
+b3 = KeyboardButton('/ru')
+b4 = KeyboardButton('/en')
+b5 = KeyboardButton('/fr')
+b6 = KeyboardButton('/de')
+
 
 """
 Google speech models/
@@ -29,6 +28,6 @@ then we auto-select a model based on the parameters in the RecognitionConfig.
 kb_client = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 
 #kb_client.add(b1).add(b2).add(b3).row(b4, b5)
-kb_client.add(b2).add(b5).add(b6).add(b7).add(b8).row(b1, b3, b4)
+kb_client.add(b2).add(b3).row(b4, b5, b6).add(b1)
 #kb_client.add(b1).add(b2).insert(b3)
 #kb_client.row(b1, b2, b3)

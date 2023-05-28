@@ -1,6 +1,6 @@
 #import pandas as pd
 #import datetime as dt
-import io
+#import io
 
 from aiogram import Dispatcher, types
 #from aiogram.dispatcher import FSMContext
@@ -19,7 +19,7 @@ idd = None
 async def moderator_command(message: types.Message):
     global idd
     idd = message.from_user.id
-    await bot.send_message(message.from_user.id, 'What do you want Sir?', reply_markup=admin_kb.button_case_admin)
+    await bot.send_message(message.from_user.id, 'What do you want Sir Yandex?', reply_markup=admin_kb.button_case_admin)
     await message.delete()
 
 
@@ -37,9 +37,9 @@ async def cm_statistics(message : types.Message):
         #buf = io.StringIO()
         #df.info(buf=buf)
         #sss = buf.getvalue()
-        sss = df.describe(include='object').to_string()
+        #sss = df.describe(include='object').to_string()
         #print(df.describe(include='object'))
-        bbuf = str(df[['use_date', 'user_name', 'action']]) + '\n-------------------------\n' + sss
+        bbuf = str(df[['use_date', 'user_name', 'action']].head(7))# + '\n-------------------------\n' + sss
         await bot.send_message(message.from_user.id, bbuf, reply_markup=admin_kb.button_case_admin)
     
 # Handlers Registration
