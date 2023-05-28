@@ -7,8 +7,6 @@ from aiogram.dispatcher import Dispatcher
 file = open('/home/pavel/cfg/config.json', 'r')
 config = json.load(file)
 
-#storage = MemoryStorage()
-
 class BotLanguage:
     rows_qty_to_select = 5
     rows_offset = 0
